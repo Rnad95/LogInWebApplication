@@ -1,12 +1,12 @@
 package com.example.loginapplication.configuration;
 
-//import com.example.loginapplication.Service.PhoneVerificationService;
 import com.example.loginapplication.Service.UserService;
-import com.example.loginapplication.Service.VerificationResult;
 import com.example.loginapplication.model.MyUsers;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.config.BeanIds;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
@@ -25,8 +25,6 @@ public class BeforeAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
     @Autowired
     private UserService userService;
-//    @Autowired
-//    PhoneVerificationService phoneSMSService;
 
     BeforeAuthenticationFilter(){
         super.setUsernameParameter("username");
@@ -46,7 +44,7 @@ public class BeforeAuthenticationFilter extends UsernamePasswordAuthenticationFi
         System.out.println("setAuthenticationSuccessHandler" + getUsernameParameter());
         super.setAuthenticationSuccessHandler(successHandler);
     }
-    @Autowired
+
     @Override
     public void setAuthenticationFailureHandler(AuthenticationFailureHandler failureHandler) {
         System.out.println("setAuthenticationFailureHandler" + getUsernameParameter());
@@ -58,15 +56,14 @@ public class BeforeAuthenticationFilter extends UsernamePasswordAuthenticationFi
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException {
         System.out.println("attemptAuthentication");
-
         MyUsers myUser = userService.getUserByEmail(request.getParameter("username"));
         System.out.println("MY USER ==> "+ myUser);
-            try {
+        try {
+            userService.generateOTPCode(myUser);
+        } catch (MessagingException | UnsupportedEncodingException e) {
+            throw new AuthenticationServiceException("Error While Sending Code to Your Email");
+        }
 
-                userService.generateOTPCode(myUser);
-            } catch (MessagingException | UnsupportedEncodingException e) {
-                throw new AuthenticationServiceException("Error While Sending Code to Your Email");
-            }
         return super.attemptAuthentication(request, response);
     }
 

@@ -1,17 +1,26 @@
 package com.example.loginapplication.configuration;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-
-
 import static org.springframework.security.extensions.saml2.config.SAMLConfigurer.saml;
 
-@Order (value =3)
+
+@ConditionalOnProperty(
+        value="lambda.application",
+        havingValue = "false",
+        matchIfMissing= true)
 @EnableWebSecurity
-@Configuration
+@EnableGlobalMethodSecurity(securedEnabled = true)
 public class SAMLSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Value("${security.saml2.metadata-url}")
     String metadataUrl;
@@ -34,12 +43,17 @@ public class SAMLSecurityConfiguration extends WebSecurityConfigurerAdapter {
             "/login" ,
             "/sendotp",
             "/saml**",
-            "/login-email" ,
+            "/login-code" ,
             "/css/**" ,
             "/js/**" ,
             "/assets/**"
     };
 
+    @Bean
+    @Override
+    protected AuthenticationManager authenticationManager() throws Exception {
+        return super.authenticationManager();
+    }
 
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
