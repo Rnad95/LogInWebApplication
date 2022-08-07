@@ -30,42 +30,44 @@ public class LoginController {
     private Authentication auth;
     @Autowired
     UserService userService;
-
-
     @GetMapping("/sign-up")
     String signUp(){
         return "sign-up";
     }
     @PostMapping("/sign-up")
     String registeration(@ModelAttribute MyUsers myUser){
-        if(userService.findByUsername(myUser.getUsername())!=null)
-        {
-            return "sign-up";
-        }
+        if(userService.findByUsername(myUser.getUsername())!=null) return "sign-up";
         myUser.setPassword(myUser.getPassword());
         myUser.setUsername(myUser.getUsername());
         userService.save(myUser);
         return "login";
 
-}
+    }
     @GetMapping("/login")
     String loginPage() {
-        auth = SecurityContextHolder.getContext().getAuthentication();
-        return (auth instanceof UsernamePasswordAuthenticationToken || auth ==null ? "home" : "login");
+        return "login";
     }
     @GetMapping("/")
     String home() {
-         auth = SecurityContextHolder.getContext().getAuthentication();
-        return (auth instanceof UsernamePasswordAuthenticationToken || auth ==null ? "home" : "redirect:/login");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return (auth instanceof AnonymousAuthenticationToken? "home":"login-email");
     }
-    @GetMapping("/login-code")
+    @GetMapping("/home")
     String LoginGeneratedCode() {
-        auth = SecurityContextHolder.getContext().getAuthentication();
-        return (auth instanceof UsernamePasswordAuthenticationToken || auth ==null ? "login-email" : "redirect:/login");
+        return "home";
     }
     @PostMapping("/verifycode")
     String verifyCode(@RequestParam("code") String code, @RequestParam("email") String email) {
         MyUsers myUsers = userService.findByUsername(email);
-        return (myUsers.getValidCode().equals(code)) ? "home": "redirect:/login-code";
+        if (myUsers.getValidCode().equals(code) && myUsers.isValid()) {
+            myUsers.setValidCode(null);
+            return "home";
+        }
+        return "redirect:/home";
+    }
+    @GetMapping("/saml/sso")
+    String SAMLLogin(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return (authentication.isAuthenticated()) ?"home":"login";
     }
 }

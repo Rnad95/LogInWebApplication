@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -40,10 +41,6 @@ public class UserService implements UserDetailsService {
     public MyUsers save(MyUsers user){
         user.setPassword(passwordEncoder().encode(user.getPassword()));
         return usersRepository.save(user);
-    }
-
-    public MyUsers getUserById(Long Id){
-        return usersRepository.getById(Id);
     }
 
     public MyUsers getUserByEmail(String email){
@@ -71,10 +68,10 @@ public class UserService implements UserDetailsService {
 //        String encodeOTP = passwordEncoder().encode(code);
         myUsers1.setValidCode(code);
         myUsers1.setValidDate(new Date());
-//        usersRepository.save(myUsers1);
+        usersRepository.save(myUsers1);
         System.out.println("******************************************");
         System.out.println("USER FROM BEFORE CLASS "+ myUsers1);
-//        sendOTPCodeByEmail(myUsers, code);
+        sendOTPCodeByEmail(myUsers, code);
 
     }
 
@@ -84,9 +81,7 @@ public class UserService implements UserDetailsService {
 
         helper.setFrom("r.khawatreh13@gmail.com", "Login Support");
         helper.setTo(myUsers.getUsername());
-
         String subject = "Verify Code - Team Support";
-
         String content = "<p><b>Hello</b>, " + myUsers.getUsername() + "</p>"
                 + "<p>For security reason, you have to the code below "
                 + "One Time Password to login:</p>"
@@ -95,16 +90,20 @@ public class UserService implements UserDetailsService {
                 + "<b>Best Regards,</b><br/>"
                 + "Team Support";
         helper.setSubject(subject);
-
         helper.setText(content, true);
-        System.out.println("SUCCESS BEFORE SENDING => "+message.getFrom());
-
+        System.out.println("SUCCESS BEFORE SENDING => "+ Arrays.toString(message.getFrom()));
+        myUsers.setValidDate(new Date());
         mailSender.send(message);
-        System.out.println("SUCCESS AFTER SENDING => "+message.getFrom());
+        System.out.println("SUCCESS AFTER SENDING => "+ Arrays.toString(message.getFrom()));
 
     }
 
     public String encodePassword(String code) {
         return passwordEncoder().encode(code);
     }
+
+    public boolean verifyTotp(String code, String validCode) {
+        return code.equals(validCode);
+    }
+
 }

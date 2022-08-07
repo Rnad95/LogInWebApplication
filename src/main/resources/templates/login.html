@@ -43,15 +43,6 @@
                                 <input type="password" id="password" class="form-control" value="password" name="password" />
                             </div>
                         </div>
-<!--                        <div class="d-flex justify-content-center align-items-center mx-4 mb-3 mb-lg-4" >-->
-<!--                            <i class="fas fa-user fa-lg me-3 fa-fw"></i>-->
-<!--                            <div class="form-outline flex-fill mb-0">-->
-<!--                                <label class="form-label" for="phone">Phone</label>-->
-<!--                                <input id="phone" class="form-control" placeholder="+9622222.." type="text" name="phone" >-->
-<!--                                <input type="button" name="sendotp" id="sendotp" class="class="form-label" btn btn-primary"  value="Send Code">-->
-
-<!--                            </div>-->
-<!--                        </div>-->
                         <div th:if="${param.otp}" class="d-flex justify-content-center align-items-center mx-4 mb-3 mb-lg-4">
                             <i class="fas fa-lock fa-lg me-3 fa-fw"></i>
                             <div class="form-outline flex-fill mb-0">
@@ -69,7 +60,7 @@
                         <div class="text-center">
                             <span class="span-or">or</span>
                             <label>Login with</label>
-                            <a th:href="@{/home}" id="log-in">Okta</a></div>
+                            <a th:href="@{/saml/sso}" id="log-in">Okta</a></div>
                         <p class="text-center">Don't have account? <a href="/sign-up" id="signup">Sign up here</a></p>
                     </div>
                 </div>
@@ -78,7 +69,6 @@
         </div>
     </div>
 </div>
-<!--<script th:src = "@{/js/bootstrap.min.js}"></script>-->
 
 
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
@@ -92,20 +82,17 @@
 
             var phone = $('#phone').val();
             console.log("PHONE => " + phone)
-            //alert(phone);
             $.ajax({
                 url: 'http://localhost:8080/sendotp',
                 method: 'POST',
                 data: {
-                    'phone': phone//pass value
+                    'phone': phone
                 },
                 success: function(data){
-                    //success function
-                    //return data form server
                     console.log("data "+ data)
                     alert('Otp sent to:'+phone);
                 },
-                error: function(data){ //error function
+                error: function(data){
                     console.log("data "+ data)
                     alert('Failed to send Otp :'+phone);
                     console.log(data)
@@ -117,11 +104,6 @@
 
 </body>
 <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-<!--<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>-->
-<!--<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>-->
-<!------ Include the above in your HEAD tag ---------->
-
-<!--<script src="https://cdn.jsdelivr.net/jquery.validation/1.15.1/jquery.validate.min.js"></script>-->
 <link href="https://fonts.googleapis.com/css?family=Kaushan+Script" rel="stylesheet">
 <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
 
